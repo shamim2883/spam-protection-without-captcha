@@ -333,7 +333,7 @@ if ( ! class_exists( 'SPWC_Hooks' ) ) {
 			return $result;
 		}
 
-		function wpcf7_verify( $result, $tags ) {
+		function wpcf7_verify( $result ) {
 			$verify = $this->verify();
 			if ( is_wp_error( $verify ) ) {
 				$result->invalidate( ['name' => 'spwc_nonce'], $verify->get_error_message() );
