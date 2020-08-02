@@ -90,6 +90,8 @@ if ( ! class_exists( 'SPWC_Hooks' ) ) {
 			add_action( 'bbp_theme_before_reply_form_submit_wrapper', [ $this, 'form_field' ] );
 			add_action( 'bbp_new_reply_pre_extras', [ $this, 'bbp_reply_verify' ], 10, 2 );
 
+			add_action( 'init', [ $this, 'set_cookie' ], 20 );
+
 			do_action( 'spwc_hooks_added', $this );
 		}
 
@@ -138,6 +140,17 @@ if ( ! class_exists( 'SPWC_Hooks' ) ) {
 			);
 		}
 
+		function set_cookie(){
+			if( ! spwc_get_option( 'enable_cookie', true ) ){
+				return;
+			}
+			$cookie = $this->token( 'cookie2' );
+			if( isset( $_COOKIE['spwc_cookie2'] ) && $cookie == $_COOKIE['spwc_cookie2'] ){
+				return;
+			}
+			setcookie( 'spwc_cookie2', $cookie, 0, '/', COOKIE_DOMAIN, false, true );
+		}
+
 		function form_field( $return = '' ) {
 			wp_enqueue_script( 'spwc_script' );
 			return $return;
@@ -180,7 +193,8 @@ if ( ! class_exists( 'SPWC_Hooks' ) ) {
 
 			if ( spwc_get_option( 'enable_cookie_check', true ) ) {
 				$response = isset( $_COOKIE['spwc_cookie'] ) ? $_COOKIE['spwc_cookie'] : '';
-				if ( ! $this->token_verify( $response, 'cookie' ) ) {
+				$response2 = isset( $_COOKIE['spwc_cookie2'] ) ? $_COOKIE['spwc_cookie2'] : '';
+				if ( ! $this->token_verify( $response, 'cookie' ) || ! $this->token_verify( $response2, 'cookie2' ) ) {
 					$last_verify = new WP_Error( 'spwc_error', __( 'Cookie check failed. Is your browser cookie enabled?', 'spam-protection-without-captcha' ) );
 					return $last_verify;
 				}
