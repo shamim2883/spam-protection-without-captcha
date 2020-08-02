@@ -95,7 +95,36 @@ if ( ! class_exists( 'SPWC_Hooks' ) ) {
 
 		function token( $action = '' ) {
 			$tick = ceil( time() / HOUR_IN_SECONDS );
-			return md5( sprintf( '%s%s%s', home_url(), $tick, $action ) );
+			$spwc_token = spwc_get_option( 'token' );
+			if( !$spwc_token ){
+				$spwc_token = wp_generate_password( 64, true, true );
+				spwc_update_option( 'token', $spwc_token );
+			}
+			return substr( wp_hash( $tick . '|' . $action . '|' . $spwc_token, 'nonce' ), -12, 10 );
+		}
+
+		function token_verify( $token, $action = '' ){
+			$token = (string) $token;
+			if( ! $token ){
+				return false;
+			}
+			$spwc_token = spwc_get_option( 'token' );
+			if( !$spwc_token ){
+				return false;
+			}
+			$tick = ceil( time() / HOUR_IN_SECONDS );
+
+			$expected = substr( wp_hash( $tick . '|' . $action . '|' . $spwc_token, 'nonce' ), -12, 10 );
+			if ( hash_equals( $expected, $token ) ) {
+				//Created in this hour
+				return true;
+			}
+			$expected = substr( wp_hash( ( $tick - 1 ) . '|' . $action . '|' . $spwc_token, 'nonce' ), -12, 10 );
+			if ( hash_equals( $expected, $token ) ) {
+				//Created in previous hour
+				return true;
+			}
+			return false;
 		}
 
 		function register_script() {
@@ -143,7 +172,7 @@ if ( ! class_exists( 'SPWC_Hooks' ) ) {
 
 			if ( spwc_get_option( 'enable_js_check', true ) ) {
 				$response = isset( $_POST['spwc_nonce'] ) ? $_POST['spwc_nonce'] : '';
-				if ( ! $response || $response !== $this->token( 'nonce' ) ) {
+				if ( ! $this->token_verify( $response, 'nonce' ) ) {
 					$last_verify = new WP_Error( 'spwc_error', __( 'javaScript check failed. Is your javaScript enabled?', 'spam-protection-without-captcha' ) );
 					return $last_verify;
 				}
@@ -151,7 +180,7 @@ if ( ! class_exists( 'SPWC_Hooks' ) ) {
 
 			if ( spwc_get_option( 'enable_cookie_check', true ) ) {
 				$response = isset( $_COOKIE['spwc_cookie'] ) ? $_COOKIE['spwc_cookie'] : '';
-				if ( ! $response || $response !== $this->token( 'cookie' ) ) {
+				if ( ! $this->token_verify( $response, 'cookie' ) ) {
 					$last_verify = new WP_Error( 'spwc_error', __( 'Cookie check failed. Is your browser cookie enabled?', 'spam-protection-without-captcha' ) );
 					return $last_verify;
 				}
