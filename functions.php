@@ -63,5 +63,14 @@ function spwc_update_option( $options, $value = '', $section = 'spwc_admin_optio
 	return true;
 }
 
-
+function spwc_is_form_enabled( $form ) {
+	if ( ! $form ) {
+		return false;
+	}
+	$enabled_forms = spwc_get_option( 'enabled_forms', [ 'login', 'registration', 'ms_user_signup', 'lost_password', 'reset_password', 'comment', 'bbp_new', 'bbp_reply', 'bp_register', 'wc_checkout', 'wpcf7' ] );
+	if ( ! is_array( $enabled_forms ) ) {
+		return false;
+	}
+	return in_array( $form, $enabled_forms, true );
+}
 

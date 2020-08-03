@@ -75,6 +75,26 @@ class SPWC_Settings {
 			$score_values[ "$i" ] = number_format_i18n( $i );
 		}
 		$fields = array(
+			'enabled_forms'      => array(
+				'label'      => __( 'Enabled Forms', 'spam-protection-without-captcha' ),
+				'section_id' => 'general',
+				'type'       => 'multicheck',
+				'class'      => 'checkbox',
+				'options'    => array(
+					'login'          => __( 'Login Form', 'spam-protection-without-captcha' ),
+					'registration'   => __( 'Registration Form', 'spam-protection-without-captcha' ),
+					'ms_user_signup' => __( 'Multisite User Signup Form', 'spam-protection-without-captcha' ),
+					'lost_password'  => __( 'Lost Password Form', 'spam-protection-without-captcha' ),
+					'reset_password' => __( 'Reset Password Form', 'spam-protection-without-captcha' ),
+					'comment'        => __( 'Comment Form', 'spam-protection-without-captcha' ),
+					'bbp_new'        => __( 'bbPress New topic', 'spam-protection-without-captcha' ),
+					'bbp_reply'      => __( 'bbPress reply to topic', 'spam-protection-without-captcha' ),
+					'bp_register'    => __( 'BuddyPress register', 'spam-protection-without-captcha' ),
+					'wc_checkout'    => __( 'WooCommerce Checkout', 'spam-protection-without-captcha' ),
+					'wpcf7'            => __( 'Contact Form 7', 'spam-protection-without-captcha' ),
+				),
+				'std' => [ 'login', 'registration', 'ms_user_signup', 'lost_password', 'reset_password', 'comment', 'bbp_new', 'bbp_reply', 'bp_register', 'wc_checkout', 'wpcf7' ],
+			),
 			'enable_js_check'      => array(
 				'label'      => __( 'JavaScript Check', 'spam-protection-without-captcha' ),
 				'section_id' => 'general',

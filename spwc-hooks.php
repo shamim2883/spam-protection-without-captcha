@@ -26,31 +26,38 @@ if ( ! class_exists( 'SPWC_Hooks' ) ) {
 			add_filter( 'spwc_verify', [ $this, 'verify_callback' ] );
 
 			//Login
-			if ( ! defined( 'XMLRPC_REQUEST' ) || ! XMLRPC_REQUEST ) {
+			if ( spwc_is_form_enabled( 'login' ) && ( ! defined( 'XMLRPC_REQUEST' ) || ! XMLRPC_REQUEST ) ) {
 				add_action( 'login_form', [ $this, 'form_field' ] );
 				add_filter( 'login_form_middle', [ $this, 'form_field' ] );
 				add_action( 'woocommerce_login_form', [ $this, 'form_field' ] );
+				add_action( 'um_after_login_fields', [ $this, 'form_field' ] );
 				add_filter( 'authenticate', [ $this, 'login_verify' ], 999 );
 			}
 
 			// Registration
-			add_action( 'register_form', [ $this, 'form_field' ] );
-			add_action( 'woocommerce_register_form', [ $this, 'form_field' ] );
-			add_filter( 'registration_errors', [ $this, 'registration_verify' ], 10, 3 );
-			add_filter( 'woocommerce_registration_errors', [ $this, 'wc_registration_verify' ], 10, 3 );
+			if ( spwc_is_form_enabled( 'registration' ) ) {
+				add_action( 'register_form', [ $this, 'form_field' ] );
+				add_action( 'woocommerce_register_form', [ $this, 'form_field' ] );
+				add_filter( 'registration_errors', [ $this, 'registration_verify' ], 10, 3 );
+				add_filter( 'woocommerce_registration_errors', [ $this, 'wc_registration_verify' ], 10, 3 );
+			}
 
 			//Lost Password
-			add_action( 'lostpassword_form', [ $this, 'form_field' ] );
-			add_action( 'woocommerce_lostpassword_form', [ $this, 'form_field' ] );
-			add_action( 'lostpassword_post', [ $this, 'lostpassword_verify' ] );
+			if ( spwc_is_form_enabled( 'lost_password' ) ) {
+				add_action( 'lostpassword_form', [ $this, 'form_field' ] );
+				add_action( 'woocommerce_lostpassword_form', [ $this, 'form_field' ] );
+				add_action( 'lostpassword_post', [ $this, 'lostpassword_verify' ] );
+			}
 
 			//Reset Password
-			add_action( 'resetpass_form', [ $this, 'form_field' ] );
-			add_action( 'woocommerce_resetpassword_form', [ $this, 'form_field' ] );
-			add_filter( 'validate_password_reset', [ $this, 'reset_password_verify' ], 10, 2 );
+			if ( spwc_is_form_enabled( 'reset_password' ) ) {
+				add_action( 'resetpass_form', [ $this, 'form_field' ] );
+				add_action( 'woocommerce_resetpassword_form', [ $this, 'form_field' ] );
+				add_filter( 'validate_password_reset', [ $this, 'reset_password_verify' ], 10, 2 );
+			}
 
 			//Comment
-			if ( ! is_admin() || ! current_user_can( 'moderate_comments' ) ) {
+			if ( spwc_is_form_enabled( 'comment' ) && ( ! is_admin() || ! current_user_can( 'moderate_comments' ) ) ) {
 
 				add_action( 'comment_form', [ $this, 'form_field' ] );
 
@@ -62,15 +69,19 @@ if ( ! class_exists( 'SPWC_Hooks' ) ) {
 			}
 
 			//Buddypress registration
-			add_action( 'bp_before_registration_submit_buttons', [ $this, 'bp_form_field' ] );
-			add_action( 'bp_signup_validate', [ $this, 'bp_registration_verify' ] );
+			if ( spwc_is_form_enabled( 'bp_register' ) ) {
+				add_action( 'bp_before_registration_submit_buttons', [ $this, 'bp_form_field' ] );
+				add_action( 'bp_signup_validate', [ $this, 'bp_registration_verify' ] );
+			}
 
 			//WooCommerce checkout
-			add_action( 'woocommerce_checkout_after_order_review', [ $this, 'form_field' ] );
-			add_action( 'woocommerce_after_checkout_validation', [ $this, 'wc_checkout_verify' ], 10, 2 );
+			if ( spwc_is_form_enabled( 'wc_checkout' ) ) {
+				add_action( 'woocommerce_checkout_after_order_review', [ $this, 'form_field' ] );
+				add_action( 'woocommerce_after_checkout_validation', [ $this, 'wc_checkout_verify' ], 10, 2 );
+			}
 
 			//Mustisite user and blog signup
-			if ( is_multisite() ) {
+			if ( spwc_is_form_enabled( 'ms_user_signup' ) && is_multisite() ) {
 				add_action( 'signup_extra_fields', [ $this, 'ms_form_field' ] );
 				add_filter( 'wpmu_validate_user_signup', [ $this, 'ms_user_verify' ] );
 				
@@ -79,16 +90,22 @@ if ( ! class_exists( 'SPWC_Hooks' ) ) {
 			}
 
 			//Contact Form 7
-			add_filter( 'wpcf7_form_elements', [ $this, 'wpcf7_form_field' ] );
-			add_filter( 'wpcf7_validate', [ $this, 'wpcf7_verify' ] );
+			if ( spwc_is_form_enabled( 'wpcf7' ) ) {
+				add_filter( 'wpcf7_form_elements', [ $this, 'wpcf7_form_field' ] );
+				add_filter( 'wpcf7_validate', [ $this, 'wpcf7_verify' ] );
+			}
 				
 			//BBpress new topic
-			add_action( 'bbp_theme_before_topic_form_submit_wrapper', [ $this, 'form_field' ] );
-			add_action( 'bbp_new_topic_pre_extras', [ $this, 'bbp_new_verify' ] );
+			if ( spwc_is_form_enabled( 'bbp_new' ) ) {
+				add_action( 'bbp_theme_before_topic_form_submit_wrapper', [ $this, 'form_field' ] );
+				add_action( 'bbp_new_topic_pre_extras', [ $this, 'bbp_new_verify' ] );
+			}
 
 			//BBpress reply to topic
-			add_action( 'bbp_theme_before_reply_form_submit_wrapper', [ $this, 'form_field' ] );
-			add_action( 'bbp_new_reply_pre_extras', [ $this, 'bbp_reply_verify' ], 10, 2 );
+			if ( spwc_is_form_enabled( 'bbp_reply' ) ) {
+				add_action( 'bbp_theme_before_reply_form_submit_wrapper', [ $this, 'form_field' ] );
+				add_action( 'bbp_new_reply_pre_extras', [ $this, 'bbp_reply_verify' ], 10, 2 );
+			}
 
 			add_action( 'init', [ $this, 'set_cookie' ], 20 );
 
