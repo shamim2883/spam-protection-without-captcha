@@ -1,11 +1,11 @@
 === Spam Protection Without Captcha ===
 Contributors: shamim51
-Tags: bot,spam,comments,without-captcha,stopforumspam,captcha
+Tags: bot,spam,comments,captcha,nocaptcha
 Donate link: https://www.shamimsplugins.com/
 Requires at least: 4.6
 Requires PHP: 5.4
-Tested up to: 5.2
-Stable tag: 1.1
+Tested up to: 5.5
+Stable tag: 1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -13,7 +13,7 @@ Protect Login, Register, Lost & Reset Password, Comment, woocommerce, CF7, bbpre
 
 == Description ==
 
-Protect Login, Register, Lost & Reset Password, Comment, woocommerce, CF7, bbpress, BuddyPress forms. No user interaction needed.
+Protect Login, Register, Lost & Reset Password, Comment, woocommerce, Contact Form 7, bbpress, BuddyPress forms. No user interaction needed.
 
 = Supported Forms =
 
@@ -62,6 +62,13 @@ If not, you can access your file via FTP or file manager and rename "spam-protec
 1. Admin settings
 
 == Changelog ==
+
+= 1.2 =
+
+* Now admin can select which forms need to validate.
+* Now secure token is used.
+* Verify token using hash_equals instead of normal equal.
+* Now set cookie using php as well.
 
 = 1.1 =
 
